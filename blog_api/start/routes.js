@@ -20,7 +20,17 @@ Route.get('/', () => {
   return { greeting: 'Hello world in JSON' }
 })
 
+Route.post('/sessions', 'SessionController.create')
+
 Route.resource('users', 'UserController')
+  .apiOnly()
+  .middleware(new Map(['update', 'destroy', 'show', 'index'], ['auth']))
 
 Route.resource('posts', 'PostController')
-    .apiOnly()
+  .apiOnly()
+  .middleware('auth')
+
+Route.post('/posts/:id/images', 'ImageController.store')
+  .middleware('auth')
+
+Route.get('/images/:path', 'ImageController.show')

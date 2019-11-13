@@ -13,19 +13,18 @@ class UserController {
         const users = await User.all()
         return users
     }
-    
+
     async store ({ request, response }) {
-        const id = request.input('id')
-        const data = request.only(['title', 'body'])
-        const user = await User.create({ ...data, user_id: id })
+        const data = request.only(['username', 'password', 'email'])
+        const user = await User.create(data)
         return user
     }
-    
+
     async show ({ params, request, response, view }) {
         const user = await User.findOrFail(params.id)
         return user
     }
-    
+
     async update ({ params, request, response }) {
         const user = await User.findOrFail(params.id)
         const data = request.only(['title', 'body'])

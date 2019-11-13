@@ -20,7 +20,10 @@ class PostController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    const posts = await Post.all()
+    const posts = await Post
+                          .query()
+                          .with('image')
+                          .fetch()
     return posts
   }
 
@@ -32,8 +35,8 @@ class PostController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
-    const id = request.input('id')
+  async store ({ auth, request, response }) {
+    const id = auth.user.id
     const data = request.only(['title', 'body'])
     const post = await Post.create({ ...data, user_id: id })
     return post
@@ -50,6 +53,7 @@ class PostController {
    */
   async show ({ params, request, response, view }) {
     const post = await Post.findOrFail(params.id)
+    await post.load('image')
     return post
   }
 
@@ -73,8 +77,10 @@ class PostController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ auth, params, request, response }) {
     const post = await Post.findOrFail(params.id)
+    if (auth.user.id !== post.user_id)
+      return response.unauthorized("Acesso não permitido")
     const data = request.only(['title', 'body'])
     post.merge(data)
     await post.save()
@@ -89,10 +95,15 @@ class PostController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ auth, params, request, response }) {
     const post = await Post.findOrFail(params.id)
+    if (auth.user.id !== post.user_id)
+      return response.unauthorized("Acesso não permitido")
     await post.delete()
   }
 }
+
+
+
 
 module.exports = PostController
