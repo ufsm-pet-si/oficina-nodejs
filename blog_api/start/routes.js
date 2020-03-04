@@ -24,7 +24,7 @@ Route.post('/sessions', 'SessionController.create')
 
 Route.resource('users', 'UserController')
   .apiOnly()
-  .middleware(new Map(['update', 'destroy', 'show', 'index'], ['auth']))
+  .middleware(new Map([['update', 'destroy', 'show', 'index'], ['auth']]))
 
 Route.resource('posts', 'PostController')
   .apiOnly()
