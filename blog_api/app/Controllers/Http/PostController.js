@@ -20,10 +20,21 @@ class PostController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    const posts = await Post
-                          .query()
-                          .with('image')
-                          .fetch()
+    const { ownerId } = request.all()
+    let posts
+    if (ownerId) {
+      posts = await Post
+        .query()
+        .where('user_id', ownerId)
+        .with('image')
+        .fetch()
+    } else {
+      posts = await Post
+        .query()
+        .with('image')
+        .fetch()
+    }
+
     return posts
   }
 
